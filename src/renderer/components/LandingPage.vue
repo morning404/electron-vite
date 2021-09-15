@@ -26,6 +26,9 @@
 				<div class="doc">
 					<el-button type="primary" round @click="openNewWin">打开新窗口</el-button>
 				</div>
+				<div>
+					<el-button type="primary" round @click="turnRoute">打开文本编辑</el-button>
+				</div>
 			</div>
 		</main>
 		<el-dialog
@@ -50,7 +53,8 @@ import { message } from "@renderer/api/login";
 const { ipcRenderer } = require("electron");
 import logo from "@renderer/assets/logo.png";
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { onUnmounted } from "vue";
+import { onMounted, onUnmounted ,} from "vue";
+import {useRoute,useRouter} from 'vue-router'
 import { useStore } from "vuex"
 
 ref: text = "等待数据读取";
@@ -75,6 +79,8 @@ ref: updateStatus = "";
 const store = useStore()
 store.dispatch("TEST_ACTION", "123456")
 
+const route = useRoute()
+const router = useRouter()
 
 function crash() {
 	process.crash();
@@ -86,6 +92,11 @@ function openNewWin() {
 		url: "/form/index",
 	};
 	ipcRenderer.invoke("open-win", data);
+}
+function turnRoute(){
+	router.push({
+		path:'/vditor'
+	})
 }
 function getMessage() {
 	message().then((res) => {
@@ -213,6 +224,11 @@ ipcRenderer.on("UpdateMsg", (event, age) => {
 ipcRenderer.on("hot-update-status", (event, msg) => {
 	updateStatus = msg.status;
 });
+onMounted(()=>{
+	console.log(route)
+	console.log(router)
+})
+
 onUnmounted(() => {
 	console.log("销毁了哦");
 	ipcRenderer.removeAllListeners("confirm-message");
